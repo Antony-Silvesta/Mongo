@@ -1,0 +1,53 @@
+name: CI/CD Pipeline with MongoDB (Automated with Python)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  connect-mongodb:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.8  # Or your preferred Python version
+
+      # Install dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pymongo
+
+      # Connect to MongoDB and perform a simple operation
+      - name: Connect to MongoDB and list collections
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}  # MongoDB URI set as a secret in GitHub
+          DB_NAME: your_database_name  # Set your database name
+        run: |
+          python -c "
+import os
+from pymongo import MongoClient
+
+# Get MongoDB URI and DB_NAME from environment variables
+mongo_uri = os.getenv('MONGO_URI')
+db_name = os.getenv('DB_NAME')
+
+# Connect to MongoDB
+client = MongoClient(mongo_uri)
+db = client[db_name]
+
+# List collections in the database
+collections = db.list_collection_names()
+print('Collections in the database:', collections)
+
+# Close the MongoDB connection
+client.close()
+          "
