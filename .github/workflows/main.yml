@@ -26,28 +26,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install pymongo
 
-      # Connect to MongoDB and perform a simple operation
+      # Run the Python script
       - name: Connect to MongoDB and list collections
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}  # MongoDB URI stored as a secret
           DB_NAME: sampleupload  # Set your database name
-        run: |
-          python -c "
-              import os
-              from pymongo import MongoClient
-
-              # Get MongoDB URI and DB_NAME from environment variables
-              mongo_uri = os.getenv('MONGO_URI')
-              db_name = os.getenv('DB_NAME')
-
-              # Connect to MongoDB
-              client = MongoClient(mongo_uri)
-              db = client[db_name]
-
-              # List collections in the database
-              collections = db.list_collection_names()
-              print('Collections in the database:', collections)
-
-              # Close the MongoDB connection
-              client.close()
-              "
+        run: python connect_mongo.py
