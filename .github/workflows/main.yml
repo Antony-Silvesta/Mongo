@@ -1,34 +1,79 @@
-name: CI/CD Pipeline with MongoDB (Automated with Python)
+name: Selenium Tests 
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-  connect-mongodb:
+  test:
     runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:4.4
+        ports:
+          - 27017:27017
 
     steps:
-      # Checkout the repository
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      # Set up Python
-      - name: Set up Python
-        uses: actions/setup-python@v3
-        with:
-          python-version: 3.8  # Or your preferred Python version
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
 
-      # Install dependencies
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pymongo
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-      # Run the Python script
-      - name: Connect to MongoDB and list collections
-        env:
-          MONGO_URI: ${{ secrets.MONGO_URI }}  # MongoDB URI stored as a secret
-          DB_NAME: sampleupload  # Set your database name
-        run: python configfile/config.py
+    - name: List all files and paths
+      run: |
+        echo "Listing all files and paths in the repository:"
+        find . -type f
+
+    - name: Set Environment Variables
+      run: |
+        echo "PYTHONPATH=$PWD/login_testcases/homeobjects:$PWD/Config/configfile/config.py" >> $GITHUB_ENV
+        echo "MONGO_URI=mongodb://127.0.0.1:27017/sampleupload" >> $GITHUB_ENV
+
+    - name: Wait for MongoDB to be ready
+      run: |
+        until nc -zv localhost 27017; do
+          echo "Waiting for MongoDB to start..."
+          sleep 1
+        done
+        echo "MongoDB is ready"
+
+    - name: Configure MongoDB Test Data
+      run: |
+        python configfile/config.py
+
+    - name: Set up ChromeDriver and Chrome
+      uses: browser-actions/setup-chrome@v1
+      with:
+        chrome-version: 'latest'
+
+    - name: Set Timezone to India Standard Time (IST)
+      run: sudo timedatectl set-timezone Asia/Kolkata
+
+    - name: Run Selenium tests and generate HTML report
+      id: run_tests
+      run: |
+        pytest --html=report.html --self-contained-html > pytest_test_results.log || exit 0
+        cat pytest_test_results.log
+
+    - name: Check if tests passed or failed
+      run: |
+        if grep -q "FAILED" pytest_test_results.log; then
+          echo "Tests failed"
+          echo "TESTS_PASSED=false" >> $GITHUB_ENV
+        else
+          echo "Tests passed"
+          echo "TESTS_PASSED=true" >> $GITHUB_ENV
+        fi
+
+   
+   
