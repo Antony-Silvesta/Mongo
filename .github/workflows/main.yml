@@ -29,25 +29,25 @@ jobs:
       # Connect to MongoDB and perform a simple operation
       - name: Connect to MongoDB and list collections
         env:
-          MONGO_URI: ${{ secrets.MONGO_URI }}  # MongoDB URI set as a secret in GitHub
-          DB_NAME: your_database_name  # Set your database name
+          MONGO_URI: ${{ secrets.mongodb://127.0.0.1:27017/sampleupload }}  # MongoDB URI set as a secret in GitHub
+          DB_NAME: sampleupload  # Set your database name
         run: |
           python -c "
-import os
-from pymongo import MongoClient
+            import os
+            from pymongo import MongoClient
 
-# Get MongoDB URI and DB_NAME from environment variables
-mongo_uri = os.getenv('MONGO_URI')
-db_name = os.getenv('DB_NAME')
+            # Get MongoDB URI and DB_NAME from environment variables
+            mongo_uri = os.getenv('MONGO_URI')
+            db_name = os.getenv('DB_NAME')
 
-# Connect to MongoDB
-client = MongoClient(mongo_uri)
-db = client[db_name]
+            # Connect to MongoDB
+            client = MongoClient(mongo_uri)
+            db = client[db_name]
 
-# List collections in the database
-collections = db.list_collection_names()
-print('Collections in the database:', collections)
+            # List collections in the database
+            collections = db.list_collection_names()
+            print('Collections in the database:', collections)
 
-# Close the MongoDB connection
-client.close()
-          "
+            # Close the MongoDB connection
+            client.close()
+                      
