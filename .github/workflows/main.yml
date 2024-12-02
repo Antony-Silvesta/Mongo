@@ -31,4 +31,4 @@ jobs:
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}  # MongoDB URI stored as a secret
           DB_NAME: sampleupload  # Set your database name
-        run: python connect_mongo.py
+        run: python configfile/config.py
