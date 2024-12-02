@@ -74,35 +74,17 @@ jobs:
           echo "Tests passed"
           echo "TESTS_PASSED=true" >> $GITHUB_ENV
         fi
-        - name: Archive Pytest Results
-        uses: actions/upload-artifact@v3
-        with:
-          name: pytest-results
-          path: pytest_test_results.log
-  
-    - name: Archive HTML Test Report
+        
+    - name: Show test results log
+      run: cat test_results.log
+    - name: Archive Test Report
       uses: actions/upload-artifact@v3
       with:
           name: selenium-test-report
           path: report.html
-  
-    - name: Archive Pytest Results (with check)
-      run: |
-          if [ -f "pytest_test_results.log" ]; then
-            echo "Pytest results archived"
-          else
-            echo "Failed to archive Pytest results"
-            exit 1
-          fi
-  
-    - name: Archive HTML Test Report (with check)
-      run: |
-          if [ -f "report.html" ]; then
-            echo "HTML test report archived"
-          else
-            echo "Failed to archive HTML test report"
-            exit 1
-          fi
-  
-   
-   
+    - name: Archive Test Results
+      uses: actions/upload-artifact@v3
+      with:
+          name: test-results
+          path: test_results.log
+    
