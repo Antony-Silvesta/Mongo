@@ -29,7 +29,7 @@ jobs:
       # Connect to MongoDB and perform a simple operation
       - name: Connect to MongoDB and list collections
         env:
-          MONGO_URI: ${{ secrets.mongodb://127.0.0.1:27017/sampleupload }}  # MongoDB URI set as a secret in GitHub
+          MONGO_URI: ${{ secrets.MONGO_URI }}  # MongoDB URI stored as a secret
           DB_NAME: sampleupload  # Set your database name
         run: |
           python -c "
@@ -50,4 +50,4 @@ jobs:
 
             # Close the MongoDB connection
             client.close()
-                      
+          "
