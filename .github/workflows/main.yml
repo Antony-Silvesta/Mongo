@@ -75,8 +75,7 @@ jobs:
           echo "TESTS_PASSED=true" >> $GITHUB_ENV
         fi
         
-    - name: Show test results log
-      run: cat test_results.log
+   
     - name: Archive Test Report
       uses: actions/upload-artifact@v3
       with:
